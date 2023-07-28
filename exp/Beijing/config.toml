@@ -1,13 +1,13 @@
-parent_dir = "exp/adult/check"
-real_data_path = "data/adult/"
-num_numerical_features = 6
-model_type = "mlp"
 seed = 0
+parent_dir = "exp/Beijing/check"
+real_data_path = "data/Beijing/"
+model_type = "mlp"
+num_numerical_features = 7
 device = "cuda:0"
 
 [model_params]
-num_classes = 2
-is_y_cond = true
+is_y_cond = false
+num_classes = 0
 
 [model_params.rtdl_params]
 d_layers = [
@@ -30,14 +30,14 @@ batch_size = 4096
 [train.T]
 seed = 0
 normalization = "quantile"
-num_nan_policy = "__none__"
+num_nan_policy = "mean"
 cat_nan_policy = "__none__"
 cat_min_frequency = "__none__"
 cat_encoding = "__none__"
 y_policy = "default"
 
 [sample]
-num_samples = 216000
+num_samples = 20800
 batch_size = 10000
 seed = 0
 
@@ -47,8 +47,8 @@ eval_type = "synthetic"
 
 [eval.T]
 seed = 0
-normalization = "__none__"
-num_nan_policy = "__none__"
+normalization = "quantile"
+num_nan_policy = "mean"
 cat_nan_policy = "__none__"
 cat_min_frequency = "__none__"
 cat_encoding = "__none__"

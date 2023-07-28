@@ -150,10 +150,12 @@ def change_val(dataset: Dataset, val_size: float = 0.2):
     # should be done before transformations
 
     y = np.concatenate([dataset.y['train'], dataset.y['val']], axis=0)
+    print(y[:10],dataset.is_regression)
 
     ixs = np.arange(y.shape[0])
     if dataset.is_regression:
         train_ixs, val_ixs = train_test_split(ixs, test_size=val_size, random_state=777)
+        print("train_ixs",train_ixs[:100])
     else:
         train_ixs, val_ixs = train_test_split(ixs, test_size=val_size, random_state=777, stratify=y)
 

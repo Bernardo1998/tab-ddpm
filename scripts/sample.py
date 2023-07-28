@@ -33,9 +33,11 @@ def sample(
     disbalance = None,
     device = torch.device('cuda:1'),
     seed = 0,
-    change_val = False
+    change_val = False,
+    test_idx=0
 ):
     zero.improve_reproducibility(seed)
+    print(model_params['num_classes'], model_params['is_y_cond'])
 
     T = lib.Transformations(**T_dict)
     D = make_dataset(
@@ -45,6 +47,7 @@ def sample(
         is_y_cond=model_params['is_y_cond'],
         change_val=change_val
     )
+    print("Torch unique:",torch.unique(torch.from_numpy(D.y['train']), return_counts=True))
 
     K = np.array(D.get_category_sizes('train'))
     if len(K) == 0 or T_dict['cat_encoding'] == 'one-hot':
@@ -63,7 +66,7 @@ def sample(
     model.load_state_dict(
         torch.load(model_path, map_location="cpu")
     )
-
+    print(K,model_params['num_classes']) 
     diffusion = GaussianMultinomialDiffusion(
         K,
         num_numerical_features=num_numerical_features_,
@@ -75,6 +78,7 @@ def sample(
     diffusion.eval()
     
     _, empirical_class_dist = torch.unique(torch.from_numpy(D.y['train']), return_counts=True)
+    print("len of empirical_class_dist",len(empirical_class_dist))
     # empirical_class_dist = empirical_class_dist.float() + torch.tensor([-5000., 10000.]).float()
     if disbalance == 'fix':
         empirical_class_dist[0], empirical_class_dist[1] = empirical_class_dist[1], empirical_class_dist[0]
@@ -126,7 +130,7 @@ def sample(
 
     X_num_ = X_gen
     if num_numerical_features < X_gen.shape[1]:
-        np.save(os.path.join(parent_dir, 'X_cat_unnorm'), X_gen[:, num_numerical_features:])
+        np.save(os.path.join(parent_dir, f'X_cat_unnorm'), X_gen[:, num_numerical_features:])
         # _, _, cat_encoder = lib.cat_encode({'train': X_cat_real}, T_dict['cat_encoding'], y_real, T_dict['seed'], True)
         if T_dict['cat_encoding'] == 'one-hot':
             X_gen[:, num_numerical_features:] = to_good_ohe(D.cat_transform.steps[0][1], X_num_[:, num_numerical_features:])
@@ -134,7 +138,7 @@ def sample(
 
     if num_numerical_features_ != 0:
         # _, normalize = lib.normalize({'train' : X_num_real}, T_dict['normalization'], T_dict['seed'], True)
-        np.save(os.path.join(parent_dir, 'X_num_unnorm'), X_gen[:, :num_numerical_features])
+        np.save(os.path.join(parent_dir, f'X_num_unnorm'), X_gen[:, :num_numerical_features])
         X_num_ = D.num_transform.inverse_transform(X_gen[:, :num_numerical_features])
         X_num = X_num_[:, :num_numerical_features]
 
@@ -153,7 +157,7 @@ def sample(
 
     if num_numerical_features != 0:
         print("Num shape: ", X_num.shape)
-        np.save(os.path.join(parent_dir, 'X_num_train'), X_num)
+        np.save(os.path.join(parent_dir, f'X_num_train'), X_num)
     if num_numerical_features < X_gen.shape[1]:
-        np.save(os.path.join(parent_dir, 'X_cat_train'), X_cat)
-    np.save(os.path.join(parent_dir, 'y_train'), y_gen)
+        np.save(os.path.join(parent_dir, f'X_cat_train'), X_cat)
+    np.save(os.path.join(parent_dir, f'y_train'), y_gen)

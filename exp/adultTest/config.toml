@@ -1,5 +1,5 @@
-parent_dir = "exp/adult/check"
-real_data_path = "data/adult/"
+parent_dir = "exp/adultTest/check"
+real_data_path = "data/adultTest/"
 num_numerical_features = 6
 model_type = "mlp"
 seed = 0
