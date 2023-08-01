@@ -37,7 +37,6 @@ def sample(
     test_idx=0
 ):
     zero.improve_reproducibility(seed)
-    print(model_params['num_classes'], model_params['is_y_cond'])
 
     T = lib.Transformations(**T_dict)
     D = make_dataset(
@@ -47,7 +46,6 @@ def sample(
         is_y_cond=model_params['is_y_cond'],
         change_val=change_val
     )
-    print("Torch unique:",torch.unique(torch.from_numpy(D.y['train']), return_counts=True))
 
     K = np.array(D.get_category_sizes('train'))
     if len(K) == 0 or T_dict['cat_encoding'] == 'one-hot':
@@ -66,7 +64,6 @@ def sample(
     model.load_state_dict(
         torch.load(model_path, map_location="cpu")
     )
-    print(K,model_params['num_classes']) 
     diffusion = GaussianMultinomialDiffusion(
         K,
         num_numerical_features=num_numerical_features_,
@@ -78,7 +75,9 @@ def sample(
     diffusion.eval()
     
     _, empirical_class_dist = torch.unique(torch.from_numpy(D.y['train']), return_counts=True)
-    print("len of empirical_class_dist",len(empirical_class_dist))
+    if sum(empirical_class_dist) <= 0:
+        empirical_class_dist = torch.tensor([1/len(empirical_class_dist) for _ in range(len(empirical_class_dist))])
+    print("len of empirical_class_dist",len(empirical_class_dist), ", Sum of empirical_class_dist", sum(empirical_class_dist))
     # empirical_class_dist = empirical_class_dist.float() + torch.tensor([-5000., 10000.]).float()
     if disbalance == 'fix':
         empirical_class_dist[0], empirical_class_dist[1] = empirical_class_dist[1], empirical_class_dist[0]
@@ -129,6 +128,7 @@ def sample(
     num_numerical_features = num_numerical_features + int(D.is_regression and not model_params["is_y_cond"])
 
     X_num_ = X_gen
+    print("Num feature number:", num_numerical_features, "Transformed data shape:",X_gen.shape[1])
     if num_numerical_features < X_gen.shape[1]:
         np.save(os.path.join(parent_dir, f'X_cat_unnorm'), X_gen[:, num_numerical_features:])
         # _, _, cat_encoder = lib.cat_encode({'train': X_cat_real}, T_dict['cat_encoding'], y_real, T_dict['seed'], True)

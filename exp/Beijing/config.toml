@@ -2,7 +2,7 @@ seed = 0
 parent_dir = "exp/Beijing/check"
 real_data_path = "data/Beijing/"
 model_type = "mlp"
-num_numerical_features = 7
+num_numerical_features = 10
 device = "cuda:0"
 
 [model_params]
@@ -22,7 +22,7 @@ gaussian_loss_type = "mse"
 scheduler = "cosine"
 
 [train.main]
-steps = 10000
+steps = 1000
 lr = 0.001
 weight_decay = 1e-05
 batch_size = 4096

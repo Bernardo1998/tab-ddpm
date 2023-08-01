@@ -9,14 +9,16 @@ import os
 from sklearn.model_selection import train_test_split
 
 def convert_csv_to_data(real_data_dir, real_data_path, target, num_cols=[], task_type='binclass'):
+    start_work_dir = os.getcwd()
     os.chdir(real_data_dir)
-    
+    print(real_data_dir)
+    real_data_path = os.path.basename(real_data_path)
     real = pd.read_csv(real_data_path)
     
     if len(num_cols) < 1:
-    	num_cols = real.select_dtypes(include='number').columns.tolist()
-    	num_cols = [c for c in num_cols if c != target] # Ensure target excluded
-    print(real_data_path, num_cols)
+        num_cols = real.select_dtypes(include='number').columns.tolist()
+        num_cols = [c for c in num_cols if c != target] # Ensure target excluded
+    print(real_data_path, num_cols, '\n')
    
     cat_cols = [c for c in real.columns if (c not in num_cols and c != target)]
     if task_type != 'regression':
@@ -30,6 +32,7 @@ def convert_csv_to_data(real_data_dir, real_data_path, target, num_cols=[], task
         real[target] = real[target].map(category_mapping)
     else:
     	inverse_mapping_str = None
+
     target_codes = real[target].values
     
 
@@ -48,8 +51,11 @@ def convert_csv_to_data(real_data_dir, real_data_path, target, num_cols=[], task
         X_num = data_this_split[num_cols].to_numpy()
         data_this_split[target] = pd.Categorical(data_this_split[target])
         y = target_codes[idx]
-        np.save(f"X_num_{split}.npy", X_num)
-        np.save(f"X_cat_{split}.npy", X_cat)
+        print(split, X_cat.shape, X_num.shape, y.shape, cat_cols, num_cols, target)
+        if len(num_cols) > 0:
+            np.save(f"X_num_{split}.npy", X_num)
+        if len(cat_cols) > 0:
+            np.save(f"X_cat_{split}.npy", X_cat)
         np.save(f"y_{split}.npy", y)
         np.save(f"idx_{split}.npy", idx)
         
@@ -66,44 +72,52 @@ def convert_csv_to_data(real_data_dir, real_data_path, target, num_cols=[], task
         "val_size": len(val_idx),
         "n_classes":n_classes
     }
+
     with open('info.json', 'w') as json_file:
         json_file.write(json.dumps(info_json))
     column_names_json = {'cat':cat_cols, 'num':num_cols, 'target':target, 'test_name':exp_name, 'inverse_mapping':inverse_mapping_str}
     with open('col_names.json', 'w') as json_file:
         json_file.write(json.dumps(column_names_json, indent=4))
+
+    os.chdir(start_work_dir)
         
-        
-convert_csv_to_data(real_data_dir='/media/xflin/10tb/Xiaofeng/TabDDPM/data/adult', 
-                    real_data_path='/media/xflin/10tb/Xiaofeng/TabDDPM/data/adult/adult.csv', 
+
+'''  
+convert_csv_to_data(real_data_dir='data/Magic', 
+                    real_data_path='data/Magic/Magic.csv', 
+                    target='class',task_type='binclass')  
+
+convert_csv_to_data(real_data_dir='data/adult', 
+                    real_data_path='data/adult/adult.csv', 
                     target='income', 
                     task_type='binclass')  
                     
-convert_csv_to_data(real_data_dir='/media/xflin/10tb/Xiaofeng/TabDDPM/data/absent', 
-                    real_data_path='/media/xflin/10tb/Xiaofeng/TabDDPM/data/absent/absent.csv', 
+convert_csv_to_data(real_data_dir='data/absent', 
+                    real_data_path='data/absent/absent.csv', 
                     num_cols = ['Month of absence', 'Day of the week',
                                'Transportation expense', 'Distance from Residence to Work',
                                'Service time', 'Age', 'Work load Average/day ', 'Hit target',
                                'Disciplinary failure', 'Education','Pet', 'Weight', 'Height', 'Body mass index'],
                     target='Absenteeism time in hours',task_type='regression')  
                   
-convert_csv_to_data(real_data_dir='/media/xflin/10tb/Xiaofeng/TabDDPM/data/abalone', 
-                    real_data_path='/media/xflin/10tb/Xiaofeng/TabDDPM/data/abalone/abalone.csv', 
+convert_csv_to_data(real_data_dir='data/abalone', 
+                    real_data_path='data/abalone/abalone.csv', 
                     target='Rings',task_type='regression')  
                   
-convert_csv_to_data(real_data_dir='/media/xflin/10tb/Xiaofeng/TabDDPM/data/Churn_Modelling', 
-                    real_data_path='/media/xflin/10tb/Xiaofeng/TabDDPM/data/Churn_Modelling/Churn_Modelling.csv', 
+convert_csv_to_data(real_data_dir='data/Churn_Modelling', 
+                    real_data_path='data/Churn_Modelling/Churn_Modelling.csv', 
                     target='Exited',task_type='binclass')  
                     
-convert_csv_to_data(real_data_dir='/media/xflin/10tb/Xiaofeng/TabDDPM/data/Bean', 
-                    real_data_path='/media/xflin/10tb/Xiaofeng/TabDDPM/data/Bean/Bean.csv', 
+convert_csv_to_data(real_data_dir='data/Bean', 
+                    real_data_path='data/Bean/Bean.csv', 
                     target='Class',task_type='multiclass')  
                     
-convert_csv_to_data(real_data_dir='/media/xflin/10tb/Xiaofeng/TabDDPM/data/Beijing', 
-                    real_data_path='/media/xflin/10tb/Xiaofeng/TabDDPM/data/Beijing/Beijing.csv', 
+convert_csv_to_data(real_data_dir='data/Beijing', 
+                    real_data_path='data/Beijing/Beijing.csv', 
                     target='pm2.5',task_type='regression')  
                     
-convert_csv_to_data(real_data_dir='/media/xflin/10tb/Xiaofeng/TabDDPM/data/faults', 
-                    real_data_path='/media/xflin/10tb/Xiaofeng/TabDDPM/data/faults/faults.csv', 
+convert_csv_to_data(real_data_dir='data/faults', 
+                    real_data_path='data/faults/faults.csv', 
                     num_cols = ['X_Minimum', 'X_Maximum', 'Y_Minimum', 'Y_Maximum', 'Pixels_Areas',
                                'X_Perimeter', 'Y_Perimeter', 'Sum_of_Luminosity',
                                'Minimum_of_Luminosity', 'Maximum_of_Luminosity', 'Length_of_Conveyer',
@@ -114,38 +128,45 @@ convert_csv_to_data(real_data_dir='/media/xflin/10tb/Xiaofeng/TabDDPM/data/fault
                                'SigmoidOfAreas'],
                     target='Other_Faults',task_type='multiclass')  
                     
-convert_csv_to_data(real_data_dir='/media/xflin/10tb/Xiaofeng/TabDDPM/data/HTRU_2', 
-                    real_data_path='/media/xflin/10tb/Xiaofeng/TabDDPM/data/HTRU_2/HTRU_2.csv', 
+                    
+convert_csv_to_data(real_data_dir='data/HTRU_2', 
+                    real_data_path='data/HTRU_2/HTRU_2.csv', 
                     target='Class',task_type='binclass')  
                     
-convert_csv_to_data(real_data_dir='/media/xflin/10tb/Xiaofeng/TabDDPM/data/insurance', 
-                    real_data_path='/media/xflin/10tb/Xiaofeng/TabDDPM/data/insurance/insurance.csv', 
+convert_csv_to_data(real_data_dir='data/insurance', 
+                    real_data_path='data/insurance/insurance.csv', 
                     target='charges',task_type='regression')  
                     
-convert_csv_to_data(real_data_dir='/media/xflin/10tb/Xiaofeng/TabDDPM/data/Magic', 
-                    real_data_path='/media/xflin/10tb/Xiaofeng/TabDDPM/data/Magic/Magic.csv', 
-                    target='class',task_type='binclass')  
+
                     
-convert_csv_to_data(real_data_dir='/media/xflin/10tb/Xiaofeng/TabDDPM/data/News', 
-                    real_data_path='/media/xflin/10tb/Xiaofeng/TabDDPM/data/News/News.csv', 
+convert_csv_to_data(real_data_dir='data/News', 
+                    real_data_path='data/News/News.csv', 
                     target=' shares',task_type='regression')  
                     
-convert_csv_to_data(real_data_dir='/media/xflin/10tb/Xiaofeng/TabDDPM/data/nursery', 
-                    real_data_path='/media/xflin/10tb/Xiaofeng/TabDDPM/data/nursery/nursery.csv', 
+convert_csv_to_data(real_data_dir='data/nursery', 
+                    real_data_path='data/nursery/nursery.csv', 
                     target='final evaluation',task_type='multiclass')  
                     
-convert_csv_to_data(real_data_dir='/media/xflin/10tb/Xiaofeng/TabDDPM/data/Obesity', 
-                    real_data_path='/media/xflin/10tb/Xiaofeng/TabDDPM/data/Obesity/Obesity.csv', 
+convert_csv_to_data(real_data_dir='data/Obesity', 
+                    real_data_path='data/Obesity/Obesity.csv', 
                     target='NObeyesdad',task_type='multiclass')  
                
                     
-convert_csv_to_data(real_data_dir='/media/xflin/10tb/Xiaofeng/TabDDPM/data/Titanic', 
-                    real_data_path='/media/xflin/10tb/Xiaofeng/TabDDPM/data/Titanic/Titanic.csv', 
+convert_csv_to_data(real_data_dir='data/Titanic', 
+                    real_data_path='data/Titanic/Titanic.csv', 
                     target='Embarked',task_type='multiclass')  
                     
-convert_csv_to_data(real_data_dir='/media/xflin/10tb/Xiaofeng/TabDDPM/data/wilt', 
-                    real_data_path='/media/xflin/10tb/Xiaofeng/TabDDPM/data/wilt/wilt.csv', 
+convert_csv_to_data(real_data_dir='data/wilt', 
+                    real_data_path='data/wilt/wilt.csv', 
                     target='class',task_type='binclass')  
                     
                    
-                    
+'''                  
+
+convert_csv_to_data(real_data_dir='data/indian_liver_patient', 
+                    real_data_path='data/indian_liver_patient/indian_liver_patient.csv', 
+                    target='Dataset',task_type='binclass') 
+
+convert_csv_to_data(real_data_dir='data/Shoppers', 
+                    real_data_path='data/Shoppers/Shoppers.csv', 
+                    target='Revenue',task_type='binclass') 

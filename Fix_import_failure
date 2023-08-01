@@ -1,0 +1,1 @@
+export PYTHONPATH="${PYTHONPATH}:/mnt/g/My Drive/TabDDPM/tab-ddpm/"

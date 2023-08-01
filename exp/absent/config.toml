@@ -1,8 +1,8 @@
 seed = 0
-parent_dir = "exp/abalone/check"
-real_data_path = "data/abalone/"
+parent_dir = "exp/absent/check"
+real_data_path = "data/absent/"
 model_type = "mlp"
-num_numerical_features = 7
+num_numerical_features = 14
 device = "cuda:0"
 
 [model_params]
@@ -30,7 +30,7 @@ batch_size = 4096
 [train.T]
 seed = 0
 normalization = "quantile"
-num_nan_policy = "__none__"
+num_nan_policy = "mean"
 cat_nan_policy = "__none__"
 cat_min_frequency = "__none__"
 cat_encoding = "__none__"
@@ -48,7 +48,7 @@ eval_type = "synthetic"
 [eval.T]
 seed = 0
 normalization = "__none__"
-num_nan_policy = "__none__"
+num_nan_policy = "mean"
 cat_nan_policy = "__none__"
 cat_min_frequency = "__none__"
 cat_encoding = "__none__"

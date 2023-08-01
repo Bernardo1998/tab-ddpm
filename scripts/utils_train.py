@@ -11,7 +11,7 @@ def get_model(
     n_num_features,
     category_sizes
 ): 
-    print(model_name)
+    #print(model_name)
     if model_name == 'mlp':
         model = MLPDiffusion(**model_params)
     elif model_name == 'resnet':
@@ -58,6 +58,7 @@ def make_dataset(
             if X_cat is not None:
                 X_cat[split] = X_cat_t
             y[split] = y_t
+            print("Shape of y_t in make_dataset()",y_t.shape)
     else:
         # regression
         X_cat = {} if os.path.exists(os.path.join(data_path, 'X_cat_train.npy')) else None
@@ -72,11 +73,11 @@ def make_dataset(
                 X_num[split] = X_num_t
             if X_cat is not None:
                 X_cat[split] = X_cat_t
-            print("making dataset:", split, is_y_cond, y_t)
+            #print("making dataset:", split, is_y_cond, y_t)
             y[split] = y_t
 
     info = lib.load_json(os.path.join(data_path, 'info.json'))
-    print(y['train'],info.get('n_classes'))
+    print("N_classes",y['train'],info.get('n_classes'))
 
     D = lib.Dataset(
         X_num,
@@ -87,9 +88,9 @@ def make_dataset(
         n_classes=info.get('n_classes')
     )
     nan_count = np.count_nonzero(np.isnan(D.y['train']))
-    print(f"Number of NaN values in y['train']: {nan_count}")
+    #print(f"Number of NaN values in y['train']: {nan_count}")
 
-    print(D.y['train'], torch.from_numpy(D.y['train']), change_val, torch.unique(torch.from_numpy(D.y['train']), return_counts=True))
+    #print(D.y['train'], torch.from_numpy(D.y['train']), change_val, torch.unique(torch.from_numpy(D.y['train']), return_counts=True))
 
     if change_val:
         D = lib.change_val(D)

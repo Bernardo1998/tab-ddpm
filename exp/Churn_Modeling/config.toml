@@ -6,7 +6,7 @@ num_numerical_features = 8
 device = "cuda:0"
 
 [model_params]
-is_y_cond = True
+is_y_cond = true
 num_classes = 8
 
 [model_params.rtdl_params]

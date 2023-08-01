@@ -15,6 +15,7 @@ catboost_info/
 exp/**/check
 exp/**/**/results_catboost.json
 exp/**/**/results_mlp.json
+*.txt
 
 configs/
 data/

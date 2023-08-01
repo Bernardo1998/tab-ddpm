@@ -110,14 +110,13 @@ def train(
     K = np.array(dataset.get_category_sizes('train'))
     if len(K) == 0 or T_dict['cat_encoding'] == 'one-hot':
         K = np.array([0])
-    print(K)
+    #print(K)
 
     num_numerical_features = dataset.X_num['train'].shape[1] if dataset.X_num is not None else 0
     d_in = np.sum(K) + num_numerical_features
     model_params['d_in'] = d_in
-    print(d_in)
     
-    print(model_params)
+    #print(model_params)
     model = get_model(
         model_type,
         model_params,
